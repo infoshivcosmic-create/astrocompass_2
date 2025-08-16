@@ -100,13 +100,13 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
   
   return (
     <div className="flex flex-col items-center">
-      <div className="flex items-center justify-center gap-4 w-full max-w-sm sm:max-w-md">
+      <div className="flex items-center justify-center gap-4 w-full">
         <Button variant="outline" size="icon" onClick={() => onThemeChange('prev')} aria-label="Previous theme">
           <ArrowLeft className="h-5 w-5" />
         </Button>
 
         <div className={cn(
-            "relative w-[400px] h-[400px] transition-all duration-500 ease-in-out transform-gpu",
+            "relative w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] transition-all duration-500 ease-in-out transform-gpu",
             isMounted ? "scale-100 opacity-100" : "scale-75 opacity-0"
           )}>
           {/* Compass Dial */}
@@ -123,9 +123,9 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0
             border-l-[15px] border-l-transparent
             border-r-[15px] border-r-transparent
-            border-t-[25px] border-t-destructive
+            border-b-[25px] border-b-destructive
             drop-shadow-lg"
-            style={{ transform: 'translateY(-10px)' }}
+            style={{ transform: 'translateY(-20px) rotate(180deg)' }}
           />
         </div>
 
