@@ -92,6 +92,11 @@ interface CompassComponentProps {
 
 export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, themeIndex, onThemeChange }) => {
   const DialComponent = themes[themeIndex];
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
   
   return (
     <div className="flex flex-col items-center">
@@ -100,10 +105,13 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
           <ArrowLeft className="h-5 w-5" />
         </Button>
 
-        <div className="relative w-[400px] h-[400px]">
+        <div className={cn(
+            "relative w-[400px] h-[400px] transition-all duration-500 ease-in-out transform-gpu",
+            isMounted ? "scale-100 opacity-100" : "scale-75 opacity-0"
+          )}>
           {/* Compass Dial */}
           <div
-            className="w-full h-full transition-transform duration-500 ease-in-out"
+            className="w-full h-full transition-transform duration-500 ease-in-out origin-center"
             style={{ transform: `rotate(${-1 * (heading || 0)}deg)` }}
           >
             <div>
@@ -117,7 +125,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
             border-r-[15px] border-r-transparent
             border-t-[25px] border-t-destructive
             drop-shadow-lg"
-            style={{ transform: 'translateX(-50%) translateY(-20px) rotate(180deg)' }}
+            style={{ transform: 'translateY(-10px)' }}
           />
         </div>
 
