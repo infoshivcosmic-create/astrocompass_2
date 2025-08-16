@@ -17,6 +17,17 @@ interface CompassComponentProps {
   onThemeChange: (direction: 'next' | 'prev') => void;
 }
 
+const DirectionIndicator = () => (
+    <div
+      className="absolute top-[-25px] w-0 h-0
+        border-l-[10px] border-l-transparent
+        border-r-[10px] border-r-transparent
+        border-b-[20px] border-b-destructive
+        drop-shadow-lg z-10"
+      style={{ left: '50%', transform: 'translateX(-50%)' }}
+     />
+  );
+
 export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, themeIndex, onThemeChange }) => {
   const activeTheme = themes[themeIndex];
   const [isMounted, setIsMounted] = React.useState(false);
@@ -36,12 +47,11 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
             "relative w-[400px] h-[400px] transition-all duration-500 ease-in-out transform-gpu",
             isMounted ? "scale-100 opacity-100" : "scale-75 opacity-0"
           )}>
-          {/* Compass Dial */}
           <div
             className="w-full h-full transition-transform duration-500 ease-in-out origin-center"
             style={{ transform: `rotate(${-1 * (heading || 0)}deg)` }}
           >
-            <div className="w-full h-full">
+            <div className="relative w-full h-full">
                <Image
                 src={activeTheme.src}
                 data-ai-hint={activeTheme.hint}
@@ -50,8 +60,17 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
                 height={400}
                 priority
                />
+               <div
+                 className="absolute top-0 w-0 h-0
+                   border-l-[10px] border-l-transparent
+                   border-r-[10px] border-r-transparent
+                   border-b-[20px] border-b-destructive
+                   drop-shadow-lg"
+                 style={{ left: '50%', transform: 'translateX(-50%)' }}
+                />
             </div>
           </div>
+          <div className="absolute top-[-25px] text-center w-full z-10 font-bold text-destructive">N</div>
         </div>
 
         <Button variant="outline" size="icon" onClick={() => onThemeChange('next')} aria-label="Next theme">

@@ -45,8 +45,7 @@ export default function TrueNorthPage() {
   }, []);
 
   const handleOrientation = (event: DeviceOrientationEvent) => {
-    // webkitCompassHeading is for iOS
-    const newHeading = (event as any).webkitCompassHeading || event.alpha;
+    const newHeading = (event as any).webkitCompassHeading ?? event.alpha;
     if (newHeading !== null) {
       setHeading(Math.round(newHeading));
     }
@@ -108,24 +107,12 @@ export default function TrueNorthPage() {
     });
   }
   
-  const DirectionIndicator = () => (
-    <div
-      className="absolute top-[-25px] w-0 h-0
-        border-l-[10px] border-l-transparent
-        border-r-[10px] border-r-transparent
-        border-b-[20px] border-b-destructive
-        drop-shadow-lg z-10"
-      style={{ left: '50%', transform: 'translateX(-50%)' }}
-     />
-  );
-
   const renderContent = () => {
     switch (permissionState) {
       case 'granted':
         return (
           <>
             <div className="relative flex items-center justify-center">
-              <DirectionIndicator />
               <CompassComponent
                 heading={heading}
                 themeIndex={currentThemeIndex}
