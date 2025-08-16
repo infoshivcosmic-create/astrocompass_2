@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Compass, Home, Info, Loader2 } from 'lucide-react';
 import { vastuShastraInformation, VastuShastraInformationOutput } from '@/ai/flows/vastu-shastra-information';
 import Image from 'next/image';
@@ -47,7 +47,7 @@ export default function TrueNorthPage() {
   const handleOrientation = (event: DeviceOrientationEvent) => {
     // webkitCompassHeading is for iOS
     const newHeading = (event as any).webkitCompassHeading || (360 - event.alpha!);
-    setHeading(newHeading);
+    setHeading(Math.round(newHeading));
   };
 
   const requestPermission = async () => {
@@ -71,31 +71,29 @@ export default function TrueNorthPage() {
     }
   };
 
-  const debouncedHeading = useMemo(() => {
-    if (heading === null) return null;
-    return Math.round(heading / 5) * 5; // Update every 5 degrees
-  }, [heading]);
-
+  const getVastuInfo = useCallback(async (currentHeading: number) => {
+    setIsLoadingVastu(true);
+    try {
+      const result: VastuShastraInformationOutput = await vastuShastraInformation({ direction: currentHeading });
+      setVastuInfo(result.vastuInfo);
+    } catch (error) {
+      console.error("Error fetching Vastu info:", error);
+      setVastuInfo("Could not retrieve Vastu information at this time.");
+    }
+    setIsLoadingVastu(false);
+  }, []);
 
   useEffect(() => {
-    if (debouncedHeading === null || permissionState !== 'granted') return;
+    if (heading === null || permissionState !== 'granted') return;
 
-    const handler = setTimeout(async () => {
-      setIsLoadingVastu(true);
-      try {
-        const result: VastuShastraInformationOutput = await vastuShastraInformation({ direction: debouncedHeading });
-        setVastuInfo(result.vastuInfo);
-      } catch (error) {
-        console.error("Error fetching Vastu info:", error);
-        setVastuInfo("Could not retrieve Vastu information at this time.");
-      }
-      setIsLoadingVastu(false);
-    }, 1000);
+    const handler = setTimeout(() => {
+      getVastuInfo(heading);
+    }, 1000); // 1-second debounce
 
     return () => {
       clearTimeout(handler);
     };
-  }, [debouncedHeading, permissionState]);
+  }, [heading, permissionState, getVastuInfo]);
   
   const handleThemeChange = (direction: 'next' | 'prev') => {
     setCurrentThemeIndex(prev => {
@@ -110,7 +108,7 @@ export default function TrueNorthPage() {
   
   const DirectionIndicator = () => (
     <div
-      className="absolute top-[-20px] w-0 h-0
+      className="absolute top-[-25px] w-0 h-0
         border-l-[10px] border-l-transparent
         border-r-[10px] border-r-transparent
         border-b-[20px] border-b-destructive
@@ -125,7 +123,6 @@ export default function TrueNorthPage() {
         return (
           <>
             <div className="relative flex items-center justify-center">
-               <DirectionIndicator />
               <CompassComponent
                 heading={heading}
                 themeIndex={currentThemeIndex}
