@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Compass, Home, Info, Loader2 } from 'lucide-react';
 import { vastuShastraInformation, VastuShastraInformationOutput } from '@/ai/flows/vastu-shastra-information';
 import Image from 'next/image';
@@ -31,8 +31,12 @@ const VastuCard = ({ info, isLoading }: { info: string | null; isLoading: boolea
   </Card>
 );
 
+// Simple smoothing factor for the compass heading
+const SMOOTHING_FACTOR = 0.1;
+
 export default function TrueNorthPage() {
   const [heading, setHeading] = useState<number | null>(null);
+  const smoothedHeading = useRef<number | null>(null);
   const [permissionState, setPermissionState] = useState<'prompt' | 'granted' | 'denied' | 'unsupported'>('prompt');
   const [vastuInfo, setVastuInfo] = useState<string | null>(null);
   const [isLoadingVastu, setIsLoadingVastu] = useState(false);
@@ -45,9 +49,23 @@ export default function TrueNorthPage() {
   }, []);
 
   const handleOrientation = (event: DeviceOrientationEvent) => {
-    const newHeading = (event as any).webkitCompassHeading ?? event.alpha;
-    if (newHeading !== null) {
-      setHeading(newHeading);
+    const rawHeading = (event as any).webkitCompassHeading ?? event.alpha;
+    if (rawHeading !== null) {
+      if (smoothedHeading.current === null) {
+        smoothedHeading.current = rawHeading;
+      } else {
+        // Apply smoothing
+        let diff = rawHeading - smoothedHeading.current;
+        // Handle wrap-around from 359 to 0 degrees and vice-versa
+        if (diff > 180) {
+          diff -= 360;
+        } else if (diff < -180) {
+          diff += 360;
+        }
+        smoothedHeading.current += diff * SMOOTHING_FACTOR;
+        smoothedHeading.current %= 360; // Keep it within 0-359
+      }
+      setHeading(smoothedHeading.current);
     }
   };
 
