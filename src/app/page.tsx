@@ -50,13 +50,15 @@ export default function TrueNorthPage() {
 
   const handleOrientation = (event: DeviceOrientationEvent) => {
     let rawHeading: number | null = null;
-
+  
+    // iOS
     if ((event as any).webkitCompassHeading !== undefined) {
-      // iOS: already gives true heading (0 = North, clockwise)
       rawHeading = (event as any).webkitCompassHeading;
-    } else if (event.absolute && event.alpha !== null) {
-      // Android: alpha is 0 = device facing North, must convert from 360 to 0
-      rawHeading = 360 - event.alpha; // Convert to compass style (0° = North)
+    } 
+    // Android
+    else if (event.alpha !== null) {
+      // The alpha value is the compass heading in degrees, where 0 is North.
+      rawHeading = event.alpha;
     }
   
     if (rawHeading !== null) {
@@ -65,12 +67,17 @@ export default function TrueNorthPage() {
       } else {
         let diff = rawHeading - smoothedHeading.current;
   
-        // Normalize angle difference to handle wrap-around (e.g., 359° → 0°)
-        if (diff > 180) diff -= 360;
-        if (diff < -180) diff += 360;
+        // Handle the wrap-around from 359 to 0 degrees and vice-versa
+        if (diff > 180) {
+          diff -= 360;
+        } else if (diff < -180) {
+          diff += 360;
+        }
   
         smoothedHeading.current += diff * SMOOTHING_FACTOR;
-        smoothedHeading.current = (smoothedHeading.current + 360) % 360; // Normalize 0–359
+  
+        // Keep the heading within the 0-360 range
+        smoothedHeading.current = (smoothedHeading.current + 360) % 360;
       }
       setHeading(smoothedHeading.current);
     }
