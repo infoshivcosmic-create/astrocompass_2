@@ -100,7 +100,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
           <ArrowLeft className="h-5 w-5" />
         </Button>
 
-        <div className="relative w-[300px] h-[300px] sm:w-[400px] sm:h-[400px]">
+        <div className="relative w-[400px] h-[400px]">
           {/* Compass Dial */}
           <div
             className="w-full h-full transition-transform duration-500 ease-in-out"
@@ -115,9 +115,9 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0
             border-l-[15px] border-l-transparent
             border-r-[15px] border-r-transparent
-            border-b-[25px] border-b-destructive
+            border-t-[25px] border-t-destructive
             drop-shadow-lg"
-            style={{ transform: 'translateX(-50%) translateY(-20px)' }}
+            style={{ transform: 'translateX(-50%) translateY(0px) rotate(180deg)' }}
           />
         </div>
 
