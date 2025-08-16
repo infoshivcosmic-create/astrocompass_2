@@ -118,15 +118,6 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
               <DialComponent />
             </div>
           </div>
-          
-          {/* Direction Indicator */}
-          <div className="absolute top-1/2 left-0 -translate-y-1/2 w-0 h-0
-            border-t-[15px] border-t-transparent
-            border-b-[15px] border-b-transparent
-            border-r-[25px] border-r-destructive
-            drop-shadow-lg"
-            style={{ transform: 'translateX(-10px)' }}
-          />
         </div>
 
         <Button variant="outline" size="icon" onClick={() => onThemeChange('next')} aria-label="Next theme">

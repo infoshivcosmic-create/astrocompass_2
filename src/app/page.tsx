@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Compass, Home, Info, Loader2 } from 'lucide-react';
 import { vastuShastraInformation, VastuShastraInformationOutput } from '@/ai/flows/vastu-shastra-information';
 
@@ -106,17 +106,32 @@ export default function TrueNorthPage() {
       }
     });
   }
+  
+  const DirectionIndicator = () => (
+    <div
+      className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0
+        border-l-[15px] border-l-transparent
+        border-r-[15px] border-r-transparent
+        border-b-[25px] border-b-destructive
+        drop-shadow-lg"
+      style={{ top: '-20px' }}
+     />
+  );
 
   const renderContent = () => {
     switch (permissionState) {
       case 'granted':
         return (
           <>
-            <CompassComponent
-              heading={heading}
-              themeIndex={currentThemeIndex}
-              onThemeChange={handleThemeChange}
-            />
+            <div className="relative">
+              <CompassComponent
+                heading={heading}
+                themeIndex={currentThemeIndex}
+                onThemeChange={handleThemeChange}
+              />
+              <DirectionIndicator />
+            </div>
+
             <VastuCard info={vastuInfo} isLoading={isLoadingVastu} />
           </>
         );
