@@ -115,10 +115,9 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0
             border-l-[15px] border-l-transparent
             border-r-[15px] border-r-transparent
-            border-t-[25px] border-t-destructive
+            border-b-[25px] border-b-destructive
             drop-shadow-lg"
           />
-          <div className="absolute top-[25px] left-1/2 -translate-x-1/2 w-[30px] h-[5px] bg-destructive/50" />
         </div>
 
         <Button variant="outline" size="icon" onClick={() => onThemeChange('next')} aria-label="Next theme">
