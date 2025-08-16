@@ -92,16 +92,7 @@ interface CompassComponentProps {
 
 export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, themeIndex, onThemeChange }) => {
   const DialComponent = themes[themeIndex];
-  const [isInitializing, setIsInitializing] = React.useState(true);
-
-  React.useEffect(() => {
-    if (heading !== null) {
-      // Use a timeout to allow the initial state to render before animating
-      const timer = setTimeout(() => setIsInitializing(false), 100);
-      return () => clearTimeout(timer);
-    }
-  }, [heading]);
-
+  
   return (
     <div className="flex flex-col items-center">
       <div className="flex items-center justify-center gap-4 w-full max-w-sm sm:max-w-md">
@@ -112,13 +103,10 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
         <div className="relative w-[400px] h-[400px]">
           {/* Compass Dial */}
           <div
-            className={cn(
-              "w-full h-full transition-transform duration-500 ease-in-out",
-              isInitializing ? 'scale-50 opacity-0' : 'scale-100 opacity-100'
-            )}
+            className="w-full h-full transition-transform duration-500 ease-in-out"
             style={{ transform: `rotate(${-1 * (heading || 0)}deg)` }}
           >
-            <div key={themeIndex} className="animate-fade-in">
+            <div>
               <DialComponent />
             </div>
           </div>
