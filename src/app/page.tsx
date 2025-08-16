@@ -109,12 +109,12 @@ export default function TrueNorthPage() {
   
   const DirectionIndicator = () => (
     <div
-      className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0
-        border-l-[15px] border-l-transparent
-        border-r-[15px] border-r-transparent
-        border-b-[25px] border-b-destructive
+      className="absolute top-0 w-0 h-0
+        border-l-[10px] border-l-transparent
+        border-r-[10px] border-r-transparent
+        border-b-[20px] border-b-destructive
         drop-shadow-lg"
-      style={{ top: '-25px' }}
+      style={{ left: '50%', transform: 'translateX(-50%)' }}
      />
   );
 
@@ -123,13 +123,13 @@ export default function TrueNorthPage() {
       case 'granted':
         return (
           <>
-            <div className="relative">
+            <div className="relative flex items-center justify-center">
+               <DirectionIndicator />
               <CompassComponent
                 heading={heading}
                 themeIndex={currentThemeIndex}
                 onThemeChange={handleThemeChange}
               />
-              <DirectionIndicator />
             </div>
 
             <VastuCard info={vastuInfo} isLoading={isLoadingVastu} />
