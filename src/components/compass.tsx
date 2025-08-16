@@ -19,7 +19,7 @@ interface CompassComponentProps {
 
 const DirectionIndicator = () => (
     <div
-      className="absolute top-[-25px] w-0 h-0
+      className="absolute top-[-40px] w-0 h-0
         border-l-[10px] border-l-transparent
         border-r-[10px] border-r-transparent
         border-b-[20px] border-b-destructive
@@ -70,7 +70,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
                 />
             </div>
           </div>
-          <div className="absolute top-[-25px] text-center w-full z-10 font-bold text-destructive">N</div>
+          <DirectionIndicator />
         </div>
 
         <Button variant="outline" size="icon" onClick={() => onThemeChange('next')} aria-label="Next theme">
