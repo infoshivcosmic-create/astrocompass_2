@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const themes = [
-  { src: "https://placehold.co/400x400.png", alt: "Compass Theme 1", hint: "abstract compass" },
-  { src: "https://placehold.co/400x400.png", alt: "Compass Theme 2", hint: "modern compass" },
+  { src: "/images/11.png", alt: "Compass Theme 1", hint: "classic compass" },
+  { src: "/images/22.png", alt: "Compass Theme 2", hint: "modern compass" },
+  { src: "/images/33.png", alt: "Compass Theme 3", hint: "vintage compass" },
 ];
 
 interface CompassComponentProps {

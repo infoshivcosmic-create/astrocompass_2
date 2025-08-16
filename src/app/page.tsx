@@ -98,7 +98,7 @@ export default function TrueNorthPage() {
   
   const handleThemeChange = (direction: 'next' | 'prev') => {
     setCurrentThemeIndex(prev => {
-      const totalThemes = 2; // Corresponds to the number of themes in CompassComponent
+      const totalThemes = 3; // Corresponds to the number of themes in CompassComponent
       if (direction === 'next') {
         return (prev + 1) % totalThemes;
       } else {
