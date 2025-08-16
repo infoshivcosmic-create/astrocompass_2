@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Compass, Home, Info, Loader2 } from 'lucide-react';
 import { vastuShastraInformation, VastuShastraInformationOutput } from '@/ai/flows/vastu-shastra-information';
+import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -112,9 +113,9 @@ export default function TrueNorthPage() {
       className="absolute top-[-20px] w-0 h-0
         border-l-[10px] border-l-transparent
         border-r-[10px] border-r-transparent
-        border-b-[20px] border-b-destructive
+        border-t-[20px] border-t-destructive
         drop-shadow-lg"
-      style={{ left: '50%', transform: 'translateX(-50%)' }}
+      style={{ left: '50%', transform: 'translateX(-50%) rotate(180deg)' }}
      />
   );
 
@@ -167,8 +168,21 @@ export default function TrueNorthPage() {
   };
 
   return (
-    <main className="flex min-h-screen w-full flex-col items-center justify-center p-4 bg-background font-body">
-      {renderContent()}
-    </main>
+    <div className="flex flex-col min-h-screen bg-background font-body">
+      <header className="flex items-center justify-start p-4 border-b relative">
+        <Image 
+          src="https://placehold.co/50x50.png"
+          data-ai-hint="logo"
+          alt="Logo"
+          width={50}
+          height={50}
+          className="rounded-full"
+        />
+        <h1 className="text-2xl font-bold absolute left-1/2 -translate-x-1/2">Shiv Astro Vastu</h1>
+      </header>
+      <main className="flex flex-1 w-full flex-col items-center justify-center p-4">
+        {renderContent()}
+      </main>
+    </div>
   );
 }
