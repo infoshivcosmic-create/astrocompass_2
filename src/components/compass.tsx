@@ -120,12 +120,12 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
           </div>
           
           {/* Direction Indicator */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0
-            border-l-[15px] border-l-transparent
-            border-r-[15px] border-r-transparent
-            border-b-[25px] border-b-destructive
+          <div className="absolute top-1/2 left-0 -translate-y-1/2 w-0 h-0
+            border-t-[15px] border-t-transparent
+            border-b-[15px] border-b-transparent
+            border-r-[25px] border-r-destructive
             drop-shadow-lg"
-            style={{ transform: 'translateY(-20px) rotate(180deg)' }}
+            style={{ transform: 'translateX(-10px)' }}
           />
         </div>
 
