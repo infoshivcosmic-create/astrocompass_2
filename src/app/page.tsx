@@ -49,43 +49,55 @@ export default function TrueNorthPage() {
   }, []);
 
   const handleOrientation = (event: DeviceOrientationEvent) => {
-    const rawHeading = (event as any).webkitCompassHeading ?? event.alpha;
+    let rawHeading: number | null = null;
+
+    if ((event as any).webkitCompassHeading !== undefined) {
+      // iOS: already gives true heading (0 = North, clockwise)
+      rawHeading = (event as any).webkitCompassHeading;
+    } else if (event.absolute && event.alpha !== null) {
+      // Android: alpha is 0 = device facing North, must convert from 360 to 0
+      rawHeading = 360 - event.alpha; // Convert to compass style (0° = North)
+    }
+  
     if (rawHeading !== null) {
       if (smoothedHeading.current === null) {
         smoothedHeading.current = rawHeading;
       } else {
-        // Apply smoothing
         let diff = rawHeading - smoothedHeading.current;
-        // Handle wrap-around from 359 to 0 degrees and vice-versa
-        if (diff > 180) {
-          diff -= 360;
-        } else if (diff < -180) {
-          diff += 360;
-        }
+  
+        // Normalize angle difference to handle wrap-around (e.g., 359° → 0°)
+        if (diff > 180) diff -= 360;
+        if (diff < -180) diff += 360;
+  
         smoothedHeading.current += diff * SMOOTHING_FACTOR;
-        smoothedHeading.current %= 360; // Keep it within 0-359
+        smoothedHeading.current = (smoothedHeading.current + 360) % 360; // Normalize 0–359
       }
       setHeading(smoothedHeading.current);
     }
   };
-
+  
   const requestPermission = async () => {
     const DOE = DeviceOrientationEvent as any;
     if (typeof DOE.requestPermission === 'function') {
       try {
         const permission = await DOE.requestPermission();
         if (permission === 'granted') {
-          window.addEventListener('deviceorientation', handleOrientation);
+          window.addEventListener('deviceorientation', handleOrientation, true);
           setPermissionState('granted');
         } else {
           setPermissionState('denied');
         }
-      } catch (error) {
+      } catch {
         setPermissionState('denied');
       }
     } else {
-      // For non-iOS 13+ devices
-      window.addEventListener('deviceorientation', handleOrientation);
+      // Android & others
+      // Prefer 'deviceorientationabsolute' for non-relative heading
+      if ('ondeviceorientationabsolute' in window) {
+        window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+      } else {
+        window.addEventListener('deviceorientation', handleOrientation, true);
+      }
       setPermissionState('granted');
     }
   };
@@ -114,6 +126,14 @@ export default function TrueNorthPage() {
     };
   }, [heading, permissionState, getVastuInfo]);
   
+  useEffect(() => {
+    // Cleanup event listeners on component unmount or when permission changes
+    return () => {
+      window.removeEventListener('deviceorientation', handleOrientation, true);
+      window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
+    };
+  }, []);
+
   const handleThemeChange = (direction: 'next' | 'prev') => {
     setCurrentThemeIndex(prev => {
       const totalThemes = 3; // Corresponds to the number of themes in CompassComponent
