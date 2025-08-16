@@ -53,19 +53,34 @@ const MinimalistDial = () => (
 );
 
 // --- THEME 3: MODERN DIAL ---
-const ModernDial = () => (
-  <svg width="100%" height="100%" viewBox="0 0 400 400">
-    <circle cx="200" cy="200" r="198" fill="hsl(var(--foreground))" />
-    <circle cx="200" cy="200" r="10" fill="hsl(var(--primary))" />
-    {/* Cardinal lines */}
-    <path d="M 200 20 L 200 60 M 380 200 L 340 200 M 200 380 L 200 340 M 20 200 L 60 200" stroke="hsl(var(--primary))" strokeWidth="3" />
-    {/* Numbers */}
-    <text x="200" y="90" fontSize="24" fill="hsl(var(--primary-foreground))" textAnchor="middle">0</text>
-    <text x="320" y="208" fontSize="24" fill="hsl(var(--primary-foreground))" textAnchor="middle">90</text>
-    <text x="200" y="325" fontSize="24" fill="hsl(var(--primary-foreground))" textAnchor="middle">180</text>
-    <text x="80" y="208" fontSize="24" fill="hsl(var(--primary-foreground))" textAnchor="middle">270</text>
-  </svg>
-);
+const ModernDial = () => {
+  const radius = 150;
+  const center = 200;
+  return (
+    <svg width="100%" height="100%" viewBox="0 0 400 400">
+      <circle cx="200" cy="200" r="198" fill="hsl(var(--foreground))" />
+      <circle cx="200" cy="200" r="10" fill="hsl(var(--primary))" />
+      {Array.from({ length: 12 }).map((_, i) => {
+        const angle = i * 30;
+        const x = center + radius * Math.sin((angle * Math.PI) / 180);
+        const y = center - radius * Math.cos((angle * Math.PI) / 180);
+        return (
+          <text
+            key={angle}
+            x={x}
+            y={y}
+            fontSize="24"
+            fill={angle === 0 ? 'hsl(var(--primary))' : 'hsl(var(--primary-foreground))'}
+            textAnchor="middle"
+            dominantBaseline="middle"
+          >
+            {angle}
+          </text>
+        );
+      })}
+    </svg>
+  );
+};
 
 const themes = [ClassicDial, MinimalistDial, ModernDial];
 
@@ -100,10 +115,10 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0
             border-l-[15px] border-l-transparent
             border-r-[15px] border-r-transparent
-            border-t-[25px] border-t-accent
+            border-t-[25px] border-t-destructive
             drop-shadow-lg"
           />
-          <div className="absolute top-[25px] left-1/2 -translate-x-1/2 w-[30px] h-[5px] bg-accent/50" />
+          <div className="absolute top-[25px] left-1/2 -translate-x-1/2 w-[30px] h-[5px] bg-destructive/50" />
         </div>
 
         <Button variant="outline" size="icon" onClick={() => onThemeChange('next')} aria-label="Next theme">
