@@ -113,9 +113,9 @@ export default function TrueNorthPage() {
       className="absolute top-[-20px] w-0 h-0
         border-l-[10px] border-l-transparent
         border-r-[10px] border-r-transparent
-        border-t-[20px] border-t-destructive
+        border-b-[20px] border-b-destructive
         drop-shadow-lg"
-      style={{ left: '50%', transform: 'translateX(-50%) rotate(180deg)' }}
+      style={{ left: '50%', transform: 'translateX(-50%)' }}
      />
   );
 
@@ -139,7 +139,7 @@ export default function TrueNorthPage() {
       case 'prompt':
         return (
           <div className="text-center p-8 border-2 border-dashed rounded-xl">
-            <h2 className="text-2xl font-bold mb-4">Welcome to True North</h2>
+            <h2 className="text-2xl font-bold mb-4">Welcome to Shiv Astro Vastu</h2>
             <p className="text-muted-foreground mb-6 max-w-sm">Click the button below to activate the compass and allow orientation sensor access.</p>
             <Button size="lg" onClick={requestPermission}>
               <Compass className="mr-2 h-5 w-5" /> Start Compass
