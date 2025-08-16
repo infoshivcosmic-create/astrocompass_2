@@ -46,8 +46,10 @@ export default function TrueNorthPage() {
 
   const handleOrientation = (event: DeviceOrientationEvent) => {
     // webkitCompassHeading is for iOS
-    const newHeading = (event as any).webkitCompassHeading || (360 - event.alpha!);
-    setHeading(Math.round(newHeading));
+    const newHeading = (event as any).webkitCompassHeading || event.alpha;
+    if (newHeading !== null) {
+      setHeading(Math.round(newHeading));
+    }
   };
 
   const requestPermission = async () => {
@@ -108,7 +110,7 @@ export default function TrueNorthPage() {
   
   const DirectionIndicator = () => (
     <div
-      className="absolute top-[-30px] w-0 h-0
+      className="absolute top-[-25px] w-0 h-0
         border-l-[10px] border-l-transparent
         border-r-[10px] border-r-transparent
         border-b-[20px] border-b-destructive
