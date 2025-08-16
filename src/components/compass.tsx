@@ -19,13 +19,9 @@ interface CompassComponentProps {
 
 const DirectionIndicator = () => (
     <div
-      className="absolute top-[-40px] w-0 h-0
-        border-l-[10px] border-l-transparent
-        border-r-[10px] border-r-transparent
-        border-b-[20px] border-b-destructive
-        drop-shadow-lg z-10"
+      className="absolute top-[-40px] h-[20px] w-[2px] bg-destructive drop-shadow-lg z-10"
       style={{ left: '50%', transform: 'translateX(-50%)' }}
-     />
+    />
   );
 
 export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, themeIndex, onThemeChange }) => {
@@ -60,14 +56,6 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
                 height={400}
                 priority
                />
-               <div
-                 className="absolute top-0 w-0 h-0
-                   border-l-[10px] border-l-transparent
-                   border-r-[10px] border-r-transparent
-                   border-b-[20px] border-b-destructive
-                   drop-shadow-lg"
-                 style={{ left: '50%', transform: 'translateX(-50%)' }}
-                />
             </div>
           </div>
           <DirectionIndicator />
@@ -78,7 +66,6 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
         </Button>
       </div>
 
-      {/* Bearing Display */}
       <div className="mt-6 text-center relative z-10">
         <p className="text-4xl font-bold font-mono tracking-tighter text-foreground pl-[5px]">
           {heading !== null ? `${Math.round(heading)}°` : '0°'}
