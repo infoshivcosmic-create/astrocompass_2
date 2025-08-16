@@ -7,9 +7,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const themes = [
-  { src: "/images/classic-compass.png", alt: "Classic Compass Theme", hint: "classic compass" },
-  { src: "/images/minimalist-compass.png", alt: "Minimalist Compass Theme", hint: "minimalist compass" },
-  { src: "/images/modern-compass.png", alt: "Modern Compass Theme", hint: "modern compass" },
+  { src: "/images/1.png", alt: "Compass Theme 1", hint: "abstract compass" },
+  { src: "/images/2.png", alt: "Compass Theme 2", hint: "modern compass" },
 ];
 
 interface CompassComponentProps {
