@@ -21,7 +21,7 @@ interface CompassComponentProps {
 const DirectionIndicator = () => (
     <div
       className="absolute top-[-40px] h-[22px] w-[3px] bg-destructive drop-shadow-lg z-10"
-      style={{ left: '50%', transform: 'translateX(-50%)' }}
+      style={{ left: '50%', transform: 'translateX(calc(-50% - 0.2px))' }}
     />
   );
 
