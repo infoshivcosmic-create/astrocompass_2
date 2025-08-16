@@ -61,7 +61,6 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
 
       {/* Bearing Display */}
       <div className="mt-6 text-center">
-        <p className="text-sm text-muted-foreground">Bearing</p>
         <p className="text-5xl font-bold font-mono tracking-tighter text-foreground">
           {heading !== null ? `${Math.round(heading)}°` : '...'}
         </p>
