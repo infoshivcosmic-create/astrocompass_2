@@ -42,8 +42,8 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
   
   return (
     <div className="flex flex-col items-center">
-      <div className="flex items-center justify-center gap-4 w-full">
-        <Button variant="outline" size="icon" onClick={() => onThemeChange('prev')} aria-label="Previous theme">
+      <div className="flex items-center justify-center w-full">
+        <Button variant="outline" size="icon" onClick={() => onThemeChange('prev')} aria-label="Previous theme" className="mr-2">
           <ArrowLeft className="h-5 w-5" />
         </Button>
 
@@ -69,7 +69,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
           <DirectionIndicator />
         </div>
 
-        <Button variant="outline" size="icon" onClick={() => onThemeChange('next')} aria-label="Next theme">
+        <Button variant="outline" size="icon" onClick={() => onThemeChange('next')} aria-label="Next theme" className="ml-2">
           <ArrowRight className="h-5 w-5" />
         </Button>
       </div>
