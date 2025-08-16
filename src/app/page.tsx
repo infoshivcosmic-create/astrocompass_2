@@ -47,7 +47,7 @@ export default function TrueNorthPage() {
   const handleOrientation = (event: DeviceOrientationEvent) => {
     const newHeading = (event as any).webkitCompassHeading ?? event.alpha;
     if (newHeading !== null) {
-      setHeading(Math.round(newHeading));
+      setHeading(newHeading);
     }
   };
 
@@ -75,7 +75,7 @@ export default function TrueNorthPage() {
   const getVastuInfo = useCallback(async (currentHeading: number) => {
     setIsLoadingVastu(true);
     try {
-      const result: VastuShastraInformationOutput = await vastuShastraInformation({ direction: currentHeading });
+      const result: VastuShastraInformationOutput = await vastuShastraInformation({ direction: Math.round(currentHeading) });
       setVastuInfo(result.vastuInfo);
     } catch (error) {
       console.error("Error fetching Vastu info:", error);
