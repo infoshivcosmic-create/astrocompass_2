@@ -92,6 +92,15 @@ interface CompassComponentProps {
 
 export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, themeIndex, onThemeChange }) => {
   const DialComponent = themes[themeIndex];
+  const [isInitializing, setIsInitializing] = React.useState(true);
+
+  React.useEffect(() => {
+    if (heading !== null) {
+      // Use a timeout to allow the initial state to render before animating
+      const timer = setTimeout(() => setIsInitializing(false), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [heading]);
 
   return (
     <div className="flex flex-col items-center">
@@ -103,7 +112,10 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
         <div className="relative w-[400px] h-[400px]">
           {/* Compass Dial */}
           <div
-            className="w-full h-full transition-transform duration-500 ease-in-out"
+            className={cn(
+              "w-full h-full transition-transform duration-500 ease-in-out",
+              isInitializing ? 'scale-50 opacity-0' : 'scale-100 opacity-100'
+            )}
             style={{ transform: `rotate(${-1 * (heading || 0)}deg)` }}
           >
             <div key={themeIndex} className="animate-fade-in">
@@ -117,7 +129,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
             border-r-[15px] border-r-transparent
             border-t-[25px] border-t-destructive
             drop-shadow-lg"
-            style={{ transform: 'translateX(-50%) translateY(0px) rotate(180deg)' }}
+            style={{ transform: 'translateX(-50%) translateY(-20px) rotate(180deg)' }}
           />
         </div>
 
@@ -136,8 +148,3 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
     </div>
   );
 };
-
-// We need to add a fade-in animation for theme changes
-// Add this to tailwind.config.ts in keyframes and animation sections:
-// keyframes: { 'fade-in': { from: { opacity: '0' }, to: { opacity: '1' } } }
-// animation: { 'fade-in': 'fade-in 0.5s ease-in-out' }
