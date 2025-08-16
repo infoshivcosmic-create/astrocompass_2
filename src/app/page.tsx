@@ -114,7 +114,7 @@ export default function TrueNorthPage() {
         border-r-[15px] border-r-transparent
         border-b-[25px] border-b-destructive
         drop-shadow-lg"
-      style={{ top: '-20px' }}
+      style={{ top: '-25px' }}
      />
   );
 
