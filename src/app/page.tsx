@@ -171,12 +171,11 @@ export default function TrueNorthPage() {
     <div className="flex flex-col min-h-screen bg-background font-body">
       <header className="flex items-center justify-start p-4 border-b relative">
         <Image 
-          src="https://placehold.co/50x50.png"
+          src="/images/logo.png"
           data-ai-hint="logo"
           alt="Logo"
           width={50}
           height={50}
-          className="rounded-full"
         />
         <h1 className="text-2xl font-bold absolute left-1/2 -translate-x-1/2">Shiv Astro Vastu</h1>
       </header>
