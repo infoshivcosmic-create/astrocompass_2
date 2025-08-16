@@ -117,7 +117,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
             border-r-[15px] border-r-transparent
             border-b-[25px] border-b-destructive
             drop-shadow-lg"
-            style={{ transform: 'translateX(-50%) translateY(-10px)' }}
+            style={{ transform: 'translateX(-50%) translateY(-20px)' }}
           />
         </div>
 
