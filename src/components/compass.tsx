@@ -20,10 +20,17 @@ interface CompassComponentProps {
 
 const DirectionIndicator = () => (
     <div
-      className="absolute top-[-30px] h-[25px] w-[3px] bg-destructive drop-shadow-lg z-10"
+      className="absolute top-[-25px] h-[28px] w-[3px] bg-destructive drop-shadow-lg z-10"
       style={{ left: '50%', transform: 'translateX(calc(-50% - 0.6px))' }}
     />
   );
+
+const getDirection = (heading: number | null): string => {
+  if (heading === null) return 'North';
+  const directions = ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'];
+  const index = Math.round(((heading % 360) / 45)) % 8;
+  return directions[index];
+}
 
 export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, themeIndex, onThemeChange }) => {
   const activeTheme = themes[themeIndex];
@@ -70,6 +77,9 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
       <div className="mt-6 text-center relative z-10">
         <p className="text-4xl font-bold font-mono tracking-tighter text-foreground pl-[5px]">
           {heading !== null ? `${Math.round(heading)}°` : '0°'}
+        </p>
+        <p className="text-xl font-medium text-muted-foreground mt-1">
+          {getDirection(heading)}
         </p>
       </div>
     </div>
