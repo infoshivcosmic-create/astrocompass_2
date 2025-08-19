@@ -20,8 +20,8 @@ interface CompassComponentProps {
 
 const DirectionIndicator = () => (
     <div
-      className="absolute top-[-15px] h-[31px] w-[3px] bg-destructive drop-shadow-lg z-10"
-      style={{ left: '50%', transform: 'translateX(calc(-50% - 0.6px))' }}
+      className="absolute top-[-10px] h-[34px] w-[3px] bg-destructive drop-shadow-lg z-10"
+      style={{ left: 'calc(50% - 0.6px)', transform: 'translateX(-50%)' }}
     />
   );
 
@@ -60,7 +60,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
           )}>
           <div
             className="w-full h-full transition-transform duration-200 ease-out origin-center"
-            style={{ transform: `rotate(${-1 * (heading || 0)}deg)` }}
+            style={{ transform: `rotate(${heading || 0}deg)` }}
           >
             <div className="relative w-full h-full">
                <Image
