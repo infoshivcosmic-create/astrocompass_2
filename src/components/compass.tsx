@@ -59,7 +59,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
             isMounted ? "scale-100 opacity-100" : "scale-75 opacity-0"
           )}>
           <div
-            className="w-full h-full transition-transform duration-50 ease-out origin-center"
+            className="w-full h-full transition-transform duration-50 ease-linear origin-center"
             style={{ transform: `rotate(-${heading || 0}deg)` }}
           >
             <div className="relative w-full h-full">

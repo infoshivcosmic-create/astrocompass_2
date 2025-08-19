@@ -37,6 +37,7 @@ export default function TrueNorthPage() {
   const [vastuInfo, setVastuInfo] = useState<string | null>(null);
   const [isLoadingVastu, setIsLoadingVastu] = useState(false);
   const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (typeof window.DeviceOrientationEvent === 'undefined') {
@@ -95,26 +96,31 @@ export default function TrueNorthPage() {
   };
 
   const getVastuInfo = useCallback(async (currentHeading: number) => {
-    setIsLoadingVastu(true);
-    try {
-      const result: VastuShastraInformationOutput = await vastuShastraInformation({ direction: Math.round(currentHeading) });
-      setVastuInfo(result.vastuInfo);
-    } catch (error) {
-      console.error("Error fetching Vastu info:", error);
-      setVastuInfo("Could not retrieve Vastu information at this time.");
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
     }
-    setIsLoadingVastu(false);
+    
+    debounceTimeoutRef.current = setTimeout(async () => {
+      setIsLoadingVastu(true);
+      try {
+        const result: VastuShastraInformationOutput = await vastuShastraInformation({ direction: Math.round(currentHeading) });
+        setVastuInfo(result.vastuInfo);
+      } catch (error) {
+        console.error("Error fetching Vastu info:", error);
+        setVastuInfo("Could not retrieve Vastu information at this time.");
+      }
+      setIsLoadingVastu(false);
+    }, 500); // 500ms debounce to wait for sensor to stabilize
   }, []);
 
   useEffect(() => {
     if (heading === null || permissionState !== 'granted') return;
-
-    const handler = setTimeout(() => {
-      getVastuInfo(heading);
-    }, 1000); // 1-second debounce
+    getVastuInfo(heading);
 
     return () => {
-      clearTimeout(handler);
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
     };
   }, [heading, permissionState, getVastuInfo]);
   
@@ -123,6 +129,9 @@ export default function TrueNorthPage() {
     return () => {
       window.removeEventListener('deviceorientation', handleOrientation, true);
       window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
     };
   }, []);
 
