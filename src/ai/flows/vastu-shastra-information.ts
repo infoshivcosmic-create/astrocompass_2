@@ -16,7 +16,7 @@ const VastuShastraInformationInputSchema = z.object({
 export type VastuShastraInformationInput = z.infer<typeof VastuShastraInformationInputSchema>;
 
 const VastuShastraInformationOutputSchema = z.object({
-  vastuInfo: z.string().describe('Vastu Shastra information for the given direction.'),
+  vastuInfo: z.string().describe('Vastu Shastra information including significance, strengths, weaknesses, and remedies for the given direction.'),
 });
 export type VastuShastraInformationOutput = z.infer<typeof VastuShastraInformationOutputSchema>;
 
@@ -28,19 +28,33 @@ const vastuShastraInformationPrompt = ai.definePrompt({
   name: 'vastuShastraInformationPrompt',
   input: {schema: VastuShastraInformationInputSchema},
   output: {schema: VastuShastraInformationOutputSchema},
-  prompt: `You are an expert in Vastu Shastra. Provide information and predictions based on Vastu Shastra principles for the following compass direction: {{direction}} degrees.
+  prompt: `You are an expert in Vastu Shastra, following the 16-zone MahaVastu system. Provide detailed information for the compass direction of {{direction}} degrees.
 
-Consider these directions as:
-North: Represents wealth and career.
-East: Represents social connections and overall well-being.
-South: Represents strength and fame.
-West: Represents peace and prosperity.
-Northeast: Represents spiritual growth and knowledge.
-Southeast: Represents passion and creativity.
-Southwest: Represents skills and stability.
-Northwest: Represents support and change.
+Your response should include:
+1.  **Significance:** What the zone represents (e.g., Health & Immunity, Money & Opportunities).
+2.  **Strengths:** Positive attributes of the direction.
+3.  **Weaknesses:** Potential negative attributes or imbalances.
+4.  **Remedies:** Simple, practical remedies to balance the zone.
 
-Give vastu shastra information in brief.
+Use this 16-zone model for your analysis:
+- North (N): 348.75° - 11.25°
+- North-North-East (NNE): 11.25° - 33.75°
+- North-East (NE): 33.75° - 56.25°
+- East-North-East (ENE): 56.25° - 78.75°
+- East (E): 78.75° - 101.25°
+- East-South-East (ESE): 101.25° - 123.75°
+- South-East (SE): 123.75° - 146.25°
+- South-South-East (SSE): 146.25° - 168.75°
+- South (S): 168.75° - 191.25°
+- South-South-West (SSW): 191.25° - 213.75°
+- South-West (SW): 213.75° - 236.25°
+- West-South-West (WSW): 236.25° - 258.75°
+- West (W): 258.75° - 281.25°
+- West-North-West (WNW): 281.25° - 303.75°
+- North-West (NW): 303.75° - 326.25°
+- North-North-West (NNW): 326.25° - 348.75°
+
+Provide the information in a clear, concise, and easy-to-understand format.
 `,
 });
 

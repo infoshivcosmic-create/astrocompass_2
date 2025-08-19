@@ -27,8 +27,15 @@ const DirectionIndicator = () => (
 
 const getDirection = (heading: number | null): string => {
   if (heading === null) return 'North';
-  const directions = ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'];
-  const index = Math.round(((heading % 360) / 45)) % 8;
+  const directions = [
+    'North', 'North-North-East', 'North-East', 'East-North-East',
+    'East', 'East-South-East', 'South-East', 'South-South-East',
+    'South', 'South-South-West', 'South-West', 'West-South-West',
+    'West', 'West-North-West', 'North-West', 'North-North-West'
+  ];
+  // Each of the 16 directions covers 22.5 degrees.
+  // We shift by 11.25 degrees to center the zones.
+  const index = Math.floor(((heading + 11.25) % 360) / 22.5);
   return directions[index];
 }
 
