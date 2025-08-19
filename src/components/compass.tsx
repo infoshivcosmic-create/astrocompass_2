@@ -60,7 +60,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
           )}>
           <div
             className="w-full h-full transition-transform duration-200 ease-out origin-center"
-            style={{ transform: `rotate(${heading || 0}deg)` }}
+            style={{ transform: `rotate(-${heading || 0}deg)` }}
           >
             <div className="relative w-full h-full">
                <Image
