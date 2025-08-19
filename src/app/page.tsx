@@ -31,12 +31,8 @@ const VastuCard = ({ info, isLoading }: { info: string | null; isLoading: boolea
   </Card>
 );
 
-// Simple smoothing factor for the compass heading
-const SMOOTHING_FACTOR = 0.1;
-
 export default function TrueNorthPage() {
   const [heading, setHeading] = useState<number | null>(null);
-  const smoothedHeading = useRef<number | null>(null);
   const [permissionState, setPermissionState] = useState<'prompt' | 'granted' | 'denied' | 'unsupported'>('prompt');
   const [vastuInfo, setVastuInfo] = useState<string | null>(null);
   const [isLoadingVastu, setIsLoadingVastu] = useState(false);
@@ -62,24 +58,7 @@ export default function TrueNorthPage() {
     }
   
     if (rawHeading !== null) {
-      if (smoothedHeading.current === null) {
-        smoothedHeading.current = rawHeading;
-      } else {
-        let diff = rawHeading - smoothedHeading.current;
-  
-        // Handle the wrap-around from 359 to 0 degrees and vice-versa
-        if (diff > 180) {
-          diff -= 360;
-        } else if (diff < -180) {
-          diff += 360;
-        }
-  
-        smoothedHeading.current += diff * SMOOTHING_FACTOR;
-  
-        // Keep the heading within the 0-360 range
-        smoothedHeading.current = (smoothedHeading.current + 360) % 360;
-      }
-      setHeading(smoothedHeading.current);
+      setHeading(rawHeading);
     }
   };
   
