@@ -61,6 +61,7 @@ export default function TrueNorthPage() {
     if (rawHeading !== null) {
       const roundedHeading = Math.round(rawHeading);
       setHeading(prevHeading => {
+        // Only update if the rounded heading has changed. This prevents flickering.
         if (prevHeading !== roundedHeading) {
           return roundedHeading;
         }
