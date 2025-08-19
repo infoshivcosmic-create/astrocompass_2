@@ -58,7 +58,13 @@ export default function TrueNorthPage() {
     }
   
     if (rawHeading !== null) {
-      setHeading(rawHeading);
+      const roundedHeading = Math.round(rawHeading);
+      setHeading(prevHeading => {
+        if (prevHeading !== roundedHeading) {
+          return roundedHeading;
+        }
+        return prevHeading;
+      });
     }
   };
   
