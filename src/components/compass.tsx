@@ -26,14 +26,16 @@ const DirectionIndicator = () => (
   );
 
 const getDirection = (heading: number | null): string => {
-  if (heading === null) return 'North';
+  if (heading === null) return '...';
   const directions = [
     'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'N7', 'N8',
     'E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8',
     'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8',
     'W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'
   ];
-  const correctedHeading = (heading + 360 - 5.625) % 360;
+  // To align with the 32 zones, we offset the heading so that N1 starts at 0 degrees.
+  // The zone N1 is from 354.375° to 5.625°. We shift the circle by 5.625 degrees.
+  const correctedHeading = (heading + 5.625) % 360;
   const index = Math.floor(correctedHeading / 11.25);
   return directions[index] || 'North';
 }
@@ -61,7 +63,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
           )}>
           <div
             className="w-full h-full origin-center transition-transform duration-50 ease-linear"
-            style={{ transform: `rotate(${-(heading || 0)}deg)` }}
+            style={{ transform: `rotate(${-displayHeading}deg)` }}
           >
             <div className="relative w-full h-full">
                <Image
