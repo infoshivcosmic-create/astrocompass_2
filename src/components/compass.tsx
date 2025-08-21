@@ -27,15 +27,15 @@ const DirectionIndicator = () => (
 
 const getDirection = (heading: number | null): string => {
   if (heading === null) return 'North';
+  // We need to calculate the actual direction the top of the phone is pointing.
+  const trueHeading = (360 - heading) % 360;
   const directions = [
     'North', 'North-North-East', 'North-East', 'East-North-East',
     'East', 'East-South-East', 'South-East', 'South-South-East',
     'South', 'South-South-West', 'South-West', 'West-South-West',
     'West', 'West-North-West', 'North-West', 'North-North-West'
   ];
-  // Each of the 16 directions covers 22.5 degrees.
-  // We shift by 11.25 degrees to center the zones.
-  const index = Math.floor(((heading + 11.25) % 360) / 22.5);
+  const index = Math.floor(((trueHeading + 11.25) % 360) / 22.5);
   return directions[index];
 }
 
@@ -46,6 +46,8 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
   React.useEffect(() => {
     setIsMounted(true);
   }, []);
+  
+  const displayHeading = heading !== null ? Math.round((360 - heading) % 360) : 0;
   
   return (
     <div className="flex flex-col items-center">
@@ -60,7 +62,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
           )}>
           <div
             className="w-full h-full transition-transform duration-50 ease-linear origin-center"
-            style={{ transform: `rotate(${heading || 0}deg)` }}
+            style={{ transform: `rotate(${-1 * (heading || 0)}deg)` }}
           >
             <div className="relative w-full h-full">
                <Image
@@ -83,7 +85,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
 
       <div className="mt-6 text-center relative z-10">
         <p className="text-4xl font-bold font-mono tracking-tighter text-foreground pl-[5px]">
-          {heading !== null ? `${Math.round(heading)}°` : '0°'}
+          {`${displayHeading}°`}
         </p>
         <p className="text-xl font-medium text-muted-foreground mt-1">
           {getDirection(heading)}
