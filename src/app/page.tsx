@@ -55,7 +55,8 @@ export default function TrueNorthPage() {
     // Android
     else if (event.alpha !== null) {
       // The alpha value is the compass heading in degrees, where 0 is North.
-      rawHeading = event.alpha;
+      // We subtract from 360 to correct for the inverted direction.
+      rawHeading = 360 - event.alpha;
     }
   
     if (rawHeading !== null) {
