@@ -14,6 +14,7 @@ const themes = [
 
 interface CompassComponentProps {
   heading: number | null;
+  rotation: number;
   themeIndex: number;
   onThemeChange: (direction: 'next' | 'prev') => void;
 }
@@ -40,7 +41,7 @@ const getDirection = (heading: number | null): string => {
   return directions[index] || 'North';
 }
 
-export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, themeIndex, onThemeChange }) => {
+export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, rotation, themeIndex, onThemeChange }) => {
   const activeTheme = themes[themeIndex];
   const [isMounted, setIsMounted] = React.useState(false);
 
@@ -63,7 +64,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
           )}>
           <div
             className="w-full h-full origin-center transition-transform duration-50 ease-linear"
-            style={{ transform: `rotate(${-displayHeading}deg)` }}
+            style={{ transform: `rotate(${-rotation}deg)` }}
           >
             <div className="relative w-full h-full">
                <Image

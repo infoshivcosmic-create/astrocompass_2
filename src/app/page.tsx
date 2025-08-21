@@ -33,11 +33,14 @@ const VastuCard = ({ info, isLoading }: { info: string | null; isLoading: boolea
 
 export default function TrueNorthPage() {
   const [heading, setHeading] = useState<number | null>(null);
+  const [rotation, setRotation] = useState<number>(0);
   const [permissionState, setPermissionState] = useState<'prompt' | 'granted' | 'denied' | 'unsupported'>('prompt');
   const [vastuInfo, setVastuInfo] = useState<string | null>(null);
   const [isLoadingVastu, setIsLoadingVastu] = useState(false);
   const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastHeadingRef = useRef<number | null>(null);
+  const rotationRef = useRef<number>(0);
 
   useEffect(() => {
     if (typeof window.DeviceOrientationEvent === 'undefined') {
@@ -54,17 +57,30 @@ export default function TrueNorthPage() {
     } 
     // Android
     else if (event.alpha !== null) {
-      // The alpha value is the compass heading in degrees, where 0 is North.
-      // We subtract from 360 to correct for the inverted direction.
-      rawHeading = 360 - event.alpha;
+      rawHeading = event.alpha;
     }
   
     if (rawHeading !== null) {
-      const roundedHeading = Math.round(rawHeading);
+      const currentHeading = Math.round(rawHeading);
+      
       setHeading(prevHeading => {
-        // Only update if the rounded heading has changed. This prevents flickering.
-        if (prevHeading !== roundedHeading) {
-          return roundedHeading;
+        if (prevHeading !== currentHeading) {
+          if (lastHeadingRef.current !== null) {
+            const diff = currentHeading - lastHeadingRef.current;
+            // Check for wrap-around
+            if (Math.abs(diff) > 180) { // A large jump indicates a wrap-around
+              if (diff > 0) {
+                // Wrapped from 359 to 0 (anti-clockwise)
+                rotationRef.current -= 360;
+              } else {
+                // Wrapped from 0 to 359 (clockwise)
+                rotationRef.current += 360;
+              }
+            }
+          }
+          setRotation(rotationRef.current + currentHeading);
+          lastHeadingRef.current = currentHeading;
+          return currentHeading;
         }
         return prevHeading;
       });
@@ -156,6 +172,7 @@ export default function TrueNorthPage() {
             <div className="relative flex items-center justify-center">
               <CompassComponent
                 heading={heading}
+                rotation={rotation}
                 themeIndex={currentThemeIndex}
                 onThemeChange={handleThemeChange}
               />
