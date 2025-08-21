@@ -27,28 +27,37 @@ const DirectionIndicator = () => (
 
 const getDirection = (heading: number | null): string => {
   if (heading === null) return 'North';
-  // We need to calculate the actual direction the top of the phone is pointing.
-  const trueHeading = (360 - heading) % 360;
   const directions = [
     'North', 'North-North-East', 'North-East', 'East-North-East',
     'East', 'East-South-East', 'South-East', 'South-South-East',
     'South', 'South-South-West', 'South-West', 'West-South-West',
     'West', 'West-North-West', 'North-West', 'North-North-West'
   ];
-  const index = Math.floor(((trueHeading + 11.25) % 360) / 22.5);
+  const index = Math.floor(((heading + 11.25) % 360) / 22.5);
   return directions[index];
 }
 
 export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, themeIndex, onThemeChange }) => {
   const activeTheme = themes[themeIndex];
   const [isMounted, setIsMounted] = React.useState(false);
+  const prevHeadingRef = React.useRef<number | null>(null);
 
   React.useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const displayHeading = heading !== null ? Math.round(heading) : 0;
   
-  const displayHeading = heading !== null ? Math.round((360 - heading) % 360) : 0;
-  
+  // Logic to prevent jarring jump from 359 to 0 degrees
+  const headingJump =
+    prevHeadingRef.current !== null &&
+    heading !== null &&
+    Math.abs(heading - prevHeadingRef.current) > 180;
+
+  React.useEffect(() => {
+    prevHeadingRef.current = heading;
+  }, [heading]);
+
   return (
     <div className="flex flex-col items-center">
       <div className="flex items-center justify-center w-full">
@@ -61,8 +70,13 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, the
             isMounted ? "scale-100 opacity-100" : "scale-75 opacity-0"
           )}>
           <div
-            className="w-full h-full transition-transform duration-50 ease-linear origin-center"
-            style={{ transform: `rotate(${-1 * (heading || 0)}deg)` }}
+            className={cn(
+              "w-full h-full origin-center",
+              headingJump
+                ? "transition-none"
+                : "transition-transform duration-50 ease-linear"
+            )}
+            style={{ transform: `rotate(${-(heading || 0)}deg)` }}
           >
             <div className="relative w-full h-full">
                <Image
