@@ -28,6 +28,9 @@ const DirectionIndicator = () => (
 
 const getDirection = (heading: number | null): string => {
   if (heading === null) return '...';
+  // Normalize heading to be within 0-359
+  const normalizedHeading = ((heading % 360) + 360) % 360;
+
   const directions = [
     'N1', 'N2', 'N3', 'N4', 'N5', 'N6', 'N7', 'N8',
     'E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8',
@@ -36,7 +39,7 @@ const getDirection = (heading: number | null): string => {
   ];
   // To align with the 32 zones, we offset the heading so that N1 starts at 0 degrees.
   // The zone N1 is from 354.375° to 5.625°. We shift the circle by 5.625 degrees.
-  const correctedHeading = (heading + 5.625) % 360;
+  const correctedHeading = (normalizedHeading + 5.625) % 360;
   const index = Math.floor(correctedHeading / 11.25);
   return directions[index] || 'North';
 }
@@ -44,12 +47,12 @@ const getDirection = (heading: number | null): string => {
 export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, rotation, themeIndex, onThemeChange }) => {
   const activeTheme = themes[themeIndex];
   const [isMounted, setIsMounted] = React.useState(false);
-
+  
   React.useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const displayHeading = heading !== null ? Math.round(heading) : 0;
+  const displayHeading = heading !== null ? Math.round(((heading % 360) + 360) % 360) : 0;
   
   return (
     <div className="flex flex-col items-center">
@@ -63,7 +66,7 @@ export const CompassComponent: React.FC<CompassComponentProps> = ({ heading, rot
             isMounted ? "scale-100 opacity-100" : "scale-75 opacity-0"
           )}>
           <div
-            className="w-full h-full origin-center transition-transform duration-50 ease-linear"
+            className="w-full h-full origin-center transition-transform duration-100 ease-linear"
             style={{ transform: `rotate(${-rotation}deg)` }}
           >
             <div className="relative w-full h-full">

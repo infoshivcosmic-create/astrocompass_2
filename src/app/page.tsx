@@ -39,6 +39,7 @@ export default function TrueNorthPage() {
   const [isLoadingVastu, setIsLoadingVastu] = useState(false);
   const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   const lastHeadingRef = useRef<number | null>(null);
   const rotationRef = useRef<number>(0);
 
@@ -48,44 +49,62 @@ export default function TrueNorthPage() {
     }
   }, []);
 
-  const handleOrientation = (event: DeviceOrientationEvent) => {
+  const handleOrientation = useCallback((event: DeviceOrientationEvent) => {
     let rawHeading: number | null = null;
   
     // iOS
     if ((event as any).webkitCompassHeading !== undefined) {
       rawHeading = (event as any).webkitCompassHeading;
     } 
-    // Android
+    // Android (and others)
     else if (event.alpha !== null) {
-      rawHeading = event.alpha;
+        // The alpha value is 0-360, where 0 is North.
+        // We need to reverse it for the compass dial to spin correctly.
+        rawHeading = 360 - event.alpha;
     }
   
     if (rawHeading !== null) {
-      const currentHeading = Math.round(rawHeading);
-      
-      setHeading(prevHeading => {
-        if (prevHeading !== currentHeading) {
-          if (lastHeadingRef.current !== null) {
-            const diff = currentHeading - lastHeadingRef.current;
-            // Check for wrap-around
-            if (Math.abs(diff) > 180) { // A large jump indicates a wrap-around
-              if (diff > 0) {
-                // Wrapped from 359 to 0 (anti-clockwise)
-                rotationRef.current -= 360;
-              } else {
-                // Wrapped from 0 to 359 (clockwise)
-                rotationRef.current += 360;
-              }
+        const currentHeading = Math.round(rawHeading);
+
+        setHeading(prevHeading => {
+            // Only update if the heading has changed by at least 1 degree
+            if (prevHeading !== currentHeading) {
+                
+                if (lastHeadingRef.current !== null) {
+                    const diff = currentHeading - lastHeadingRef.current;
+                    // Check for wrap-around. A large jump indicates a wrap-around.
+                    if (Math.abs(diff) > 180) { 
+                        // If diff > 0, we wrapped from ~359 to ~0 (e.g. 359 -> 1, diff is -358)
+                        // If diff < 0, we wrapped from ~0 to ~359 (e.g. 1 -> 359, diff is 358)
+                        if (diff > 0) {
+                            // Wrapped anti-clockwise (e.g. 1 -> 359), so subtract 360 from cumulative
+                            rotationRef.current -= 360;
+                        } else {
+                            // Wrapped clockwise (e.g. 359 -> 1), so add 360 to cumulative
+                            rotationRef.current += 360;
+                        }
+                    }
+                }
+                
+                // Update rotation state based on the continuous rotation.
+                // We calculate the change from the last *raw* heading to the current one.
+                if (lastHeadingRef.current !== null) {
+                    const change = currentHeading - lastHeadingRef.current;
+                    rotationRef.current += change;
+                } else {
+                    // First reading
+                    rotationRef.current = currentHeading;
+                }
+
+                setRotation(rotationRef.current);
+                lastHeadingRef.current = currentHeading;
+                
+                return currentHeading;
             }
-          }
-          setRotation(rotationRef.current + currentHeading);
-          lastHeadingRef.current = currentHeading;
-          return currentHeading;
-        }
-        return prevHeading;
-      });
+            return prevHeading;
+        });
     }
-  };
+  }, []);
   
   const requestPermission = async () => {
     const DOE = DeviceOrientationEvent as any;
@@ -103,7 +122,6 @@ export default function TrueNorthPage() {
       }
     } else {
       // Android & others
-      // Prefer 'deviceorientationabsolute' for non-relative heading
       if ('ondeviceorientationabsolute' in window) {
         window.addEventListener('deviceorientationabsolute', handleOrientation, true);
       } else {
@@ -128,7 +146,7 @@ export default function TrueNorthPage() {
         setVastuInfo("Could not retrieve Vastu information at this time.");
       }
       setIsLoadingVastu(false);
-    }, 500); // 500ms debounce to wait for sensor to stabilize
+    }, 500);
   }, []);
 
   useEffect(() => {
@@ -143,7 +161,6 @@ export default function TrueNorthPage() {
   }, [heading, permissionState, getVastuInfo]);
   
   useEffect(() => {
-    // Cleanup event listeners on component unmount or when permission changes
     return () => {
       window.removeEventListener('deviceorientation', handleOrientation, true);
       window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
@@ -151,11 +168,11 @@ export default function TrueNorthPage() {
         clearTimeout(debounceTimeoutRef.current);
       }
     };
-  }, []);
+  }, [handleOrientation]);
 
   const handleThemeChange = (direction: 'next' | 'prev') => {
     setCurrentThemeIndex(prev => {
-      const totalThemes = 3; // Corresponds to the number of themes in CompassComponent
+      const totalThemes = 3; 
       if (direction === 'next') {
         return (prev + 1) % totalThemes;
       } else {
