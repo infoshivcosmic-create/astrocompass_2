@@ -51,19 +51,25 @@ export default function TrueNorthPage() {
 
   const handleOrientation = useCallback((event: DeviceOrientationEvent) => {
     let rawHeading: number | null = null;
+    const webkitCompassHeading = (event as any).webkitCompassHeading;
+    const alpha = event.alpha;
+    const screenOrientation = window.orientation || 0; // 0, 90, -90, 180
 
     // iOS
-    if ((event as any).webkitCompassHeading !== undefined) {
-      rawHeading = (event as any).webkitCompassHeading;
+    if (webkitCompassHeading !== undefined) {
+      rawHeading = webkitCompassHeading;
     }
     // Android (and others)
-    else if (event.alpha !== null) {
-      rawHeading = (360 - event.alpha) % 360;
+    else if (alpha !== null) {
+      // The alpha value is the direction the device is pointed in degrees, where 0 is North.
+      // We need to correct for the screen orientation.
+      rawHeading = (alpha + screenOrientation) % 360;
     }
 
     if (rawHeading !== null) {
       const currentHeading = Math.round(rawHeading);
 
+      // Only update if the heading has changed by at least 1 degree
       if (lastHeadingRef.current !== currentHeading) {
         setHeading(currentHeading);
         
@@ -71,6 +77,8 @@ export default function TrueNorthPage() {
         const diff = currentHeading - lastHeading;
         
         let newRotation = rotationRef.current;
+
+        // Handle the 360/0 degree crossover by finding the shortest path
         if (diff > 180) { // Wrapped around counter-clockwise
           newRotation -= (360 - diff);
         } else if (diff < -180) { // Wrapped around clockwise
