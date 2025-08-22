@@ -40,6 +40,9 @@ export default function TrueNorthPage() {
   const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
+  const rotationRef = useRef(0);
+  const lastHeadingRef = useRef<number | null>(null);
+
   useEffect(() => {
     if (typeof window.DeviceOrientationEvent === 'undefined') {
       setPermissionState('unsupported');
@@ -55,13 +58,33 @@ export default function TrueNorthPage() {
     }
     // Android (and others)
     else if (event.alpha !== null) {
+      // Android alpha is 0-360, where 0 is North. It increases as you turn left (counter-clockwise).
+      // We want it to increase as you turn right (clockwise).
       rawHeading = 360 - event.alpha;
     }
 
     if (rawHeading !== null) {
-      const currentHeading = Math.round(rawHeading);
-      setHeading(currentHeading);
-      setRotation(currentHeading);
+      const currentHeading = Math.round(rawHeading) % 360;
+
+      if (lastHeadingRef.current !== currentHeading) {
+        setHeading(currentHeading);
+        
+        const lastHeading = lastHeadingRef.current ?? currentHeading;
+        const diff = currentHeading - lastHeading;
+        
+        let newRotation = rotationRef.current;
+        if (diff > 180) { // Wrapped around counter-clockwise
+          newRotation -= (360 - diff);
+        } else if (diff < -180) { // Wrapped around clockwise
+          newRotation += (360 + diff);
+        } else {
+          newRotation += diff;
+        }
+
+        rotationRef.current = newRotation;
+        lastHeadingRef.current = currentHeading;
+        setRotation(newRotation);
+      }
     }
   }, []);
   
