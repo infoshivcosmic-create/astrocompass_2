@@ -51,44 +51,45 @@ export default function TrueNorthPage() {
 
   const handleOrientation = useCallback((event: DeviceOrientationEvent) => {
     let rawHeading: number | null = null;
-    const webkitCompassHeading = (event as any).webkitCompassHeading;
-    const alpha = event.alpha;
-    const screenOrientation = window.orientation || 0; // 0, 90, -90, 180
 
     // iOS
-    if (webkitCompassHeading !== undefined) {
+    const webkitCompassHeading = (event as any).webkitCompassHeading;
+    if (typeof webkitCompassHeading !== 'undefined') {
       rawHeading = webkitCompassHeading;
-    }
-    // Android (and others)
-    else if (alpha !== null) {
+    } 
+    // Android & other modern browsers
+    else if (event.alpha !== null) {
       // The alpha value is the direction the device is pointed in degrees, where 0 is North.
-      // We need to correct for the screen orientation.
-      rawHeading = (alpha + screenOrientation) % 360;
+      // We use absolute orientation to avoid issues with device tilting.
+      rawHeading = event.absolute ? event.alpha : null;
+      if (rawHeading === null) {
+        // Fallback for devices that don't support absolute orientation
+        rawHeading = event.alpha;
+      }
     }
 
     if (rawHeading !== null) {
       const currentHeading = Math.round(rawHeading);
 
-      // Only update if the heading has changed by at least 1 degree
+      // Only update if the heading has changed to a new whole degree
       if (lastHeadingRef.current !== currentHeading) {
         setHeading(currentHeading);
         
         const lastHeading = lastHeadingRef.current ?? currentHeading;
-        const diff = currentHeading - lastHeading;
-        
-        let newRotation = rotationRef.current;
+        let diff = currentHeading - lastHeading;
 
-        // Handle the 360/0 degree crossover by finding the shortest path
-        if (diff > 180) { // Wrapped around counter-clockwise
-          newRotation -= (360 - diff);
-        } else if (diff < -180) { // Wrapped around clockwise
-          newRotation += (360 + diff);
-        } else {
-          newRotation += diff;
+        // Find the shortest path for rotation
+        if (diff > 180) {
+          diff -= 360; // shortest path is counter-clockwise
+        } else if (diff < -180) {
+          diff += 360; // shortest path is clockwise
         }
 
+        const newRotation = rotationRef.current + diff;
         rotationRef.current = newRotation;
         lastHeadingRef.current = currentHeading;
+        
+        // We set the state that will be passed to the component for CSS rotation
         setRotation(newRotation);
       }
     }
@@ -100,8 +101,13 @@ export default function TrueNorthPage() {
       try {
         const permission = await DOE.requestPermission();
         if (permission === 'granted') {
-          window.addEventListener('deviceorientation', handleOrientation, true);
           setPermissionState('granted');
+          // Prefer 'deviceorientationabsolute' for more accurate readings on supported devices
+          if ('ondeviceorientationabsolute' in window) {
+            window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+          } else {
+            window.addEventListener('deviceorientation', handleOrientation, true);
+          }
         } else {
           setPermissionState('denied');
         }
@@ -109,13 +115,13 @@ export default function TrueNorthPage() {
         setPermissionState('denied');
       }
     } else {
-      // Android & others
-      if ('ondeviceorientationabsolute' in (window as any)) {
+      // For browsers that don't require permission (like Android Chrome)
+      setPermissionState('granted');
+      if ('ondeviceorientationabsolute' in window) {
         window.addEventListener('deviceorientationabsolute', handleOrientation, true);
       } else {
         window.addEventListener('deviceorientation', handleOrientation, true);
       }
-      setPermissionState('granted');
     }
   };
 
@@ -149,6 +155,7 @@ export default function TrueNorthPage() {
   }, [heading, permissionState, getVastuInfo]);
   
   useEffect(() => {
+    // Cleanup function to remove event listeners
     return () => {
       window.removeEventListener('deviceorientation', handleOrientation, true);
       window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
