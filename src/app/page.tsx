@@ -58,13 +58,11 @@ export default function TrueNorthPage() {
     }
     // Android (and others)
     else if (event.alpha !== null) {
-      // Android alpha is 0-360, where 0 is North. It increases as you turn left (counter-clockwise).
-      // We want it to increase as you turn right (clockwise).
-      rawHeading = 360 - event.alpha;
+      rawHeading = (360 - event.alpha) % 360;
     }
 
     if (rawHeading !== null) {
-      const currentHeading = Math.round(rawHeading) % 360;
+      const currentHeading = Math.round(rawHeading);
 
       if (lastHeadingRef.current !== currentHeading) {
         setHeading(currentHeading);
