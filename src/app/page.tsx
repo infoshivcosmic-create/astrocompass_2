@@ -40,9 +40,6 @@ export default function TrueNorthPage() {
   const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  const lastHeadingRef = useRef<number | null>(null);
-  const rotationRef = useRef<number>(0);
-
   useEffect(() => {
     if (typeof window.DeviceOrientationEvent === 'undefined') {
       setPermissionState('unsupported');
@@ -51,58 +48,20 @@ export default function TrueNorthPage() {
 
   const handleOrientation = useCallback((event: DeviceOrientationEvent) => {
     let rawHeading: number | null = null;
-  
+
     // iOS
     if ((event as any).webkitCompassHeading !== undefined) {
       rawHeading = (event as any).webkitCompassHeading;
-    } 
+    }
     // Android (and others)
     else if (event.alpha !== null) {
-        // The alpha value is 0-360, where 0 is North.
-        // We need to reverse it for the compass dial to spin correctly.
-        rawHeading = 360 - event.alpha;
+      rawHeading = 360 - event.alpha;
     }
-  
+
     if (rawHeading !== null) {
-        const currentHeading = Math.round(rawHeading);
-
-        setHeading(prevHeading => {
-            // Only update if the heading has changed by at least 1 degree
-            if (prevHeading !== currentHeading) {
-                
-                if (lastHeadingRef.current !== null) {
-                    const diff = currentHeading - lastHeadingRef.current;
-                    // Check for wrap-around. A large jump indicates a wrap-around.
-                    if (Math.abs(diff) > 180) { 
-                        // If diff > 0, we wrapped from ~359 to ~0 (e.g. 359 -> 1, diff is -358)
-                        // If diff < 0, we wrapped from ~0 to ~359 (e.g. 1 -> 359, diff is 358)
-                        if (diff > 0) {
-                            // Wrapped anti-clockwise (e.g. 1 -> 359), so subtract 360 from cumulative
-                            rotationRef.current -= 360;
-                        } else {
-                            // Wrapped clockwise (e.g. 359 -> 1), so add 360 to cumulative
-                            rotationRef.current += 360;
-                        }
-                    }
-                }
-                
-                // Update rotation state based on the continuous rotation.
-                // We calculate the change from the last *raw* heading to the current one.
-                if (lastHeadingRef.current !== null) {
-                    const change = currentHeading - lastHeadingRef.current;
-                    rotationRef.current += change;
-                } else {
-                    // First reading
-                    rotationRef.current = currentHeading;
-                }
-
-                setRotation(rotationRef.current);
-                lastHeadingRef.current = currentHeading;
-                
-                return currentHeading;
-            }
-            return prevHeading;
-        });
+      const currentHeading = Math.round(rawHeading);
+      setHeading(currentHeading);
+      setRotation(currentHeading);
     }
   }, []);
   
@@ -122,7 +81,7 @@ export default function TrueNorthPage() {
       }
     } else {
       // Android & others
-      if ('ondeviceorientationabsolute' in window) {
+      if ('ondeviceorientationabsolute' in (window as any)) {
         window.addEventListener('deviceorientationabsolute', handleOrientation, true);
       } else {
         window.addEventListener('deviceorientation', handleOrientation, true);
