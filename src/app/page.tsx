@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useGeolocated } from "react-geolocated";
 import { Compass, Home, Info, Loader2 } from 'lucide-react';
 import { vastuShastraInformation, VastuShastraInformationOutput } from '@/ai/flows/vastu-shastra-information';
 import Image from 'next/image';
@@ -38,10 +39,63 @@ export default function TrueNorthPage() {
   const [vastuInfo, setVastuInfo] = useState<string | null>(null);
   const [isLoadingVastu, setIsLoadingVastu] = useState(false);
   const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
+  const [pointDegree, setPointDegree] = useState(0);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const rotationRef = useRef(0);
   const lastHeadingRef = useRef<number | null>(null);
+
+  const { coords, isGeolocationAvailable, isGeolocationEnabled } =
+    useGeolocated({
+      positionOptions: {
+        enableHighAccuracy: false,
+      },
+      userDecisionTimeout: 5000,
+    });
+
+  const calcDegreeToPoint = (latitude: number, longitude: number) => {
+    // Qibla geolocation
+    const point = {
+      lat: 21.422487,
+      lng: 39.826206,
+    };
+
+    const phiK = (point.lat * Math.PI) / 180.0;
+    const lambdaK = (point.lng * Math.PI) / 180.0;
+    const phi = (latitude * Math.PI) / 180.0;
+    const lambda = (longitude * Math.PI) / 180.0;
+    const psi =
+      (180.0 / Math.PI) *
+      Math.atan2(
+        Math.sin(lambdaK - lambda),
+        Math.cos(phi) * Math.tan(phiK) -
+          Math.sin(phi) * Math.cos(lambdaK - lambda)
+      );
+    return Math.round(psi);
+  };
+
+  const locationHandler = (coords: { latitude: number; longitude: number }) => {
+    const { latitude, longitude } = coords;
+    const resP = calcDegreeToPoint(latitude, longitude);
+    console.log("resP", resP);
+    if (resP < 0) {
+      setPointDegree(resP + 360);
+    } else {
+      setPointDegree(resP);
+    }
+  };
+
+  useEffect(() => {
+    if (!isGeolocationAvailable) {
+      alert("Your browser does not support Geolocation");
+    } else if (!isGeolocationEnabled) {
+      alert(
+        "Geolocation is not enabled, Please allow the location check your setting"
+      );
+    } else if (coords) {
+      locationHandler(coords);
+    }
+  }, [coords, isGeolocationAvailable, isGeolocationEnabled]);
 
   useEffect(() => {
     if (typeof window.DeviceOrientationEvent === 'undefined') {
@@ -96,7 +150,7 @@ export default function TrueNorthPage() {
   }, []);
   
   const requestPermission = async () => {
-    const DOE = DeviceOrientationEvent as any;
+    const DOE = DeviceOrientationEvent as unknown as DeviceOrientationEventiOS;
     if (typeof DOE.requestPermission === 'function') {
       try {
         const permission = await DOE.requestPermission();
@@ -184,10 +238,11 @@ export default function TrueNorthPage() {
             <div className="relative flex items-center justify-center">
               <CompassComponent
                 heading={heading}
-                rotation={rotation}
                 themeIndex={currentThemeIndex}
                 onThemeChange={handleThemeChange}
               />
+              <div className="my-point" style={{ transform: `rotate(${pointDegree}deg) translateX(-50%)` }} />
+              <div className="my-point" style={{ transform: `rotate(${pointDegree}deg) translateX(-50%)` }} />
             </div>
 
             <VastuCard info={vastuInfo} isLoading={isLoadingVastu} />
