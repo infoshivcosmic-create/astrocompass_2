@@ -1,0 +1,6 @@
+{
+  "appId": "com.example.nextn",
+  "appName": "nextn",
+  "webDir": "out",
+  "bundledWebRuntime": false
+}
