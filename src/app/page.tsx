@@ -157,10 +157,10 @@ export default function TrueNorthPage() {
         if (permission === 'granted') {
           setPermissionState('granted');
           // Prefer 'deviceorientationabsolute' for more accurate readings on supported devices
-          if ('ondeviceorientationabsolute' in window) {
-            window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+          if ('ondeviceorientationabsolute' in (window as Window)) {
+            (window as Window).addEventListener('deviceorientationabsolute', handleOrientation, true);
           } else {
-            window.addEventListener('deviceorientation', handleOrientation, true);
+            (window as Window).addEventListener('deviceorientation', handleOrientation, true);
           }
         } else {
           setPermissionState('denied');
@@ -171,10 +171,10 @@ export default function TrueNorthPage() {
     } else {
       // For browsers that don't require permission (like Android Chrome)
       setPermissionState('granted');
-      if ('ondeviceorientationabsolute' in window) {
-        window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+      if ('ondeviceorientationabsolute' in (window as Window)) {
+        (window as Window).addEventListener('deviceorientationabsolute', handleOrientation, true);
       } else {
-        window.addEventListener('deviceorientation', handleOrientation, true);
+        (window as Window).addEventListener('deviceorientation', handleOrientation, true);
       }
     }
   };
